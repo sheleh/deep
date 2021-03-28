@@ -8,7 +8,7 @@ import re
 DATA_PATH = pathlib.Path(__file__).parent.joinpath('data/' + datetime.today().strftime('%y_%m_%d'))
 PLOTS_PATH = pathlib.Path(__file__).parent.joinpath('plots')
 
-
+# парсим John Hopkins University data
 def parse_jhu_confirmed(country):
     url_raw_confirmed = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data' \
               '/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
@@ -38,7 +38,7 @@ def parse_jhu_deaths(country):
     res_deaths = data_deaths_aggregated.loc[country]
     return res_deaths
 
-
+# сохраняем в CSV sep = ;
 def save_to_csv(country):
     confirmed = parse_jhu_confirmed(country)
     recovered = parse_jhu_recovered(country)
@@ -50,7 +50,7 @@ def save_to_csv(country):
     with csv_file.open('w') as f:
         f.write(csv_data)
 
-
+# Резервная функция
 def parse_wiki(country):
     DATA_PATH.mkdir(parents=True, exist_ok=True)
     csv_file = DATA_PATH.joinpath(country + '_' + datetime.today().strftime('%y_%m_%d.data'))
