@@ -16,6 +16,17 @@ def parse_jhu_confirmed(country):
     data_confirmed.drop(['Province/State', 'Lat', 'Long'], axis=1, inplace=True)
     data_aggregated_confirmed = data_confirmed.groupby('Country/Region').sum()
     res_confirmed = data_aggregated_confirmed.loc[country]
+    print(res_confirmed.head)
+    return res_confirmed
+
+
+def parse_jhu_confirmed_all():
+    url_raw_confirmed = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data' \
+              '/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
+    data_confirmed = pd.read_csv(url_raw_confirmed, sep=",")
+    data_confirmed.drop(['Province/State', 'Lat', 'Long'], axis=1, inplace=True)
+    data_aggregated_confirmed = data_confirmed.groupby('Country/Region').sum()
+    res_confirmed = data_aggregated_confirmed
     return res_confirmed
 
 
@@ -38,6 +49,21 @@ def parse_jhu_deaths(country):
     res_deaths = data_deaths_aggregated.loc[country]
     return res_deaths
 
+
+# конкатенируем данные в 1 датафрейм
+def concatenated_pd(country):
+    confirmed = parse_jhu_confirmed(country)
+    recovered = parse_jhu_recovered(country)
+    deaths = parse_jhu_deaths(country)
+    active = confirmed - recovered - deaths
+    DATA_PATH.mkdir(parents=True, exist_ok=True)
+    final = pd.concat([confirmed, recovered, deaths, active], axis=1, keys=['confirmed', 'recovered', 'deaths', 'active'])
+    return final
+
+
+
+
+# функции из предидущей версии
 # сохраняем в CSV sep = ;
 def save_to_csv(country):
     confirmed = parse_jhu_confirmed(country)
@@ -49,6 +75,7 @@ def save_to_csv(country):
     csv_data = final.to_csv(date_format='%Y-%m-%d', header=False, sep=';')
     with csv_file.open('w') as f:
         f.write(csv_data)
+
 
 # Резервная функция
 def parse_wiki(country):
@@ -71,7 +98,7 @@ def parse_wiki(country):
     csv_data = re.sub("(;;;.*?\n$)", "", csv_data, flags=re.DOTALL)
     # csv_data = re.sub("/\w++\..*/", "", csv_data, flags=re.DOTALL).strip()
     # csv_data = re.sub("+.*?}}", "", csv_data, flags=re.DOTALL).strip()
-    print(csv_data)
+    #print(csv_data)
     with csv_file.open('w') as f:
         f.write(csv_data)
 
