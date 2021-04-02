@@ -33,9 +33,9 @@ def get_population(country):
     return population_c[0][0]
 
 
-def get_countries_list():
-    c_names = session.query(population.Country)
-    return c_names
+def get_countries_exist(country):
+    res = session.query(population.Country).filter(population.Country == country).all()
+    return True if len(res) != 0 else False
 
 
 def save_to_db(country):

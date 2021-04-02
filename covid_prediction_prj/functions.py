@@ -146,6 +146,27 @@ def increase_formula(predicted_period_cases):
     return increase_past14, increase_next14
 
 
+def data_preparing(df):
+    df.columns = ['Date', 'Total confirmed', 'Recovered', 'Deaths', 'Active']
+    confirmed = df.groupby('Date').sum()['Total confirmed'].reset_index()
+    recovered = df.groupby('Date').sum()['Recovered'].reset_index()
+    deaths = df.groupby('Date').sum()['Deaths'].reset_index()
+    active = df.groupby('Date').sum()['Active'].reset_index()
+
+    confirmed.columns = ['ds', 'y']
+    confirmed['ds'] = pd.to_datetime(confirmed['ds'])
+
+    recovered.columns = ['ds', 'y']
+    recovered['ds'] = pd.to_datetime(recovered['ds'])
+
+    deaths.columns = ['ds', 'y']
+    deaths['ds'] = pd.to_datetime(deaths['ds'])
+
+    active.columns = ['ds', 'y']
+    active['ds'] = pd.to_datetime(active['ds'])
+    return confirmed, recovered, deaths, active
+
+
 def make_plot(forecast_confirmed, confirmed, forecast_recovered, recovered,
               forecast_deaths, deaths, forecast_active, active, country):
     """
